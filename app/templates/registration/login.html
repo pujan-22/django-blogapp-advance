@@ -1,11 +1,12 @@
 {% extends "base.html" %}
 {% block title %}Blog | Login {% endblock title %}
+{% load static %}
 {% block content %}
 <form action="{% url "login" %}" method="post" class="form">
     {% csrf_token %}
       <center>
         <div class="logo f-logo">
-          <i class="fa-brands fa-blogger"></i>
+          <img src="{% static "images/icon.png" %}"/>
         </div>
 
         
@@ -40,6 +41,6 @@
           <p>Not have an account? <a href="{% url "register" %}">Sign up</a></p>
         </div>
       </center>
-    </form>
+  </form>
   
 {% endblock content %}

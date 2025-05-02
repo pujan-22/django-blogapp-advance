@@ -35,7 +35,7 @@ class Tag(models.Model):
 class Post(models.Model):
     title = models.CharField(max_length=200)
     content = models.TextField()
-    # created_at = models.DateTimeField(auto_now=False)
+    # created_at = models.DateTimeField(auto_now_add=True)
     last_updated = models.DateTimeField(auto_now=True)
     slug = models.SlugField(max_length=200, unique=True)
     image = models.ImageField(null=True, blank=True, upload_to="images/")
@@ -49,18 +49,20 @@ class Post(models.Model):
     def like_count(self):
         return self.likes.count
     
+    def comment_count(self):
+        return self.comments.filter(parent__isnull=True).count()
+    
+    def __str__(self):
+        return self.title
+    
 
 class Comment(models.Model):
     content = models.TextField()
     date= models.DateTimeField(auto_now=True)
-    name = models.CharField(max_length=200)
-    email = models.EmailField(max_length=200)
-    post = models.ForeignKey(Post, on_delete=models.CASCADE)
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='comments')
     author = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     parent = models.ForeignKey('self', on_delete=models.DO_NOTHING, null=True, blank=True, related_name='replies')
 
-    def comment_count(self):
-        return self.count
 
 
 class WebsiteMeta(models.Model):

@@ -36,7 +36,8 @@ db.sqlite3-journal
 production_settings.py
 
 # Media files
-media
+**/media
+upload 
 
 # Django migrations
 */migrations/*

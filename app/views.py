@@ -42,8 +42,9 @@ def post_page(request, slug):
     if post.likes.filter(id=request.user.id).exists():
         liked = True
     is_liked = liked
-
     like_count = post.like_count()
+
+    #comment
     if request.POST:
         comment_form = CommentForm(request.POST)
         if comment_form.is_valid:
@@ -64,8 +65,10 @@ def post_page(request, slug):
                 postid = request.POST.get('post_id')
                 post = Post.objects.get(id = postid)
                 comment.post = post
+                comment.author = request.user
                 comment.save()
                 return HttpResponseRedirect(reverse('post_page', kwargs={'slug':slug}))
+    comment_count = post.comment_count()
 
     if post.view_count is None:
         post.view_count = 1
@@ -76,10 +79,10 @@ def post_page(request, slug):
     #sidebar
     recent_posts = Post.objects.exclude(id=post.id).order_by('-last_updated')[0:3]
     related_posts = Post.objects.exclude(id=post.id).filter(author=post.author)[0:3]
-    top_authors = User.objects.annotate(number=Count('post')).order_by('-number')
+    top_authors = User.objects.annotate(number=Count('post')).filter(number__gt=0).order_by('-number')
     tags = Tag.objects.all()
 
-    context = {'post':post, 'form':form, 'comments':comments, 'is_bookmarked':is_boomarked, 
+    context = {'post':post, 'form':form, 'comments':comments, 'comment_count':comment_count, 'is_bookmarked':is_boomarked, 
                'is_liked':is_liked, "like_count":like_count, "recent_posts":recent_posts,
                 'related_posts':related_posts, 'top_authors':top_authors, 'tags':tags }
     return render(request, 'app/post.html', context)
@@ -97,11 +100,11 @@ def tag_page(request, slug):
 
 
 def author_page(request, slug):
-    profile = Profile.objects.get(slug=slug)
+    profile = get_object_or_404(Profile, slug=slug)
 
     top_posts = Post.objects.filter(author = profile.user).order_by('-view_count')[0:2]
     recent_posts = Post.objects.filter(author = profile.user).order_by('-last_updated')[0:3]
-    top_authors = User.objects.annotate(number = Count('post')).order_by('number')
+    top_authors = User.objects.annotate(post_count=Count('post')).filter(post_count__gt=0).order_by('-post_count')
 
     context = {'profile':profile, 'top_posts':top_posts, 'recent_posts':recent_posts, 'top_authors':top_authors}
     return render(request, 'app/author.html', context)

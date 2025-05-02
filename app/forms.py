@@ -7,13 +7,11 @@ from django.contrib.auth.models import User
 class CommentForm(forms.ModelForm):
     class Meta:
         model = Comment
-        fields = {'content', 'name', 'email'}
+        fields = {'content'}
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['content'].widget.attrs['placeholder'] = "Type your comment..."
-        self.fields['name'].widget.attrs['placeholder'] = "Name"
-        self.fields['email'].widget.attrs['placeholder'] = "Email"
 
 class NewUserForm(UserCreationForm):
     class Meta:
