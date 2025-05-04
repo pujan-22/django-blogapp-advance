@@ -77,7 +77,7 @@ def post_page(request, slug):
     post.save()
 
     #sidebar
-    recent_posts = Post.objects.exclude(id=post.id).order_by('-last_updated')[0:3]
+    recent_posts = Post.objects.exclude(id=post.id).order_by('-created_at')[0:3]
     related_posts = Post.objects.exclude(id=post.id).filter(author=post.author)[0:3]
     top_authors = User.objects.annotate(number=Count('post')).filter(number__gt=0).order_by('-number')
     tags = Tag.objects.all()
@@ -103,7 +103,7 @@ def author_page(request, slug):
     profile = get_object_or_404(Profile, slug=slug)
 
     top_posts = Post.objects.filter(author = profile.user).order_by('-view_count')[0:2]
-    recent_posts = Post.objects.filter(author = profile.user).order_by('-last_updated')[0:3]
+    recent_posts = Post.objects.filter(author = profile.user).order_by('-created_at')[0:3]
     top_authors = User.objects.annotate(post_count=Count('post')).filter(post_count__gt=0).order_by('-post_count')
 
     context = {'profile':profile, 'top_posts':top_posts, 'recent_posts':recent_posts, 'top_authors':top_authors}

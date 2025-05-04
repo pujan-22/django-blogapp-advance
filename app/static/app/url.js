@@ -16,3 +16,12 @@ function toggleDiv(a) {
     replybox.style.display = "none";
   }
 }
+
+function toggleSummary() {
+  const summaryDiv = document.getElementById('summary');
+  if (summaryDiv.style.display === 'none') {
+    summaryDiv.style.display = 'block';
+  } else {
+    summaryDiv.style.display = 'none';
+  }
+}

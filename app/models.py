@@ -1,5 +1,6 @@
 from django.db import models
 from django.utils.text import slugify
+from app.summarizer import summarize_text
 from django.contrib.auth.models import User
 
 # Create your models here.
@@ -35,7 +36,7 @@ class Tag(models.Model):
 class Post(models.Model):
     title = models.CharField(max_length=200)
     content = models.TextField()
-    # created_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(auto_now_add=True)
     last_updated = models.DateTimeField(auto_now=True)
     slug = models.SlugField(max_length=200, unique=True)
     image = models.ImageField(null=True, blank=True, upload_to="images/")
@@ -45,12 +46,18 @@ class Post(models.Model):
     is_featured = models.BooleanField(default=False)
     bookmarks =models.ManyToManyField(User, related_name="bookmarks", default=None, blank=True)
     likes = models.ManyToManyField(User, related_name="likes", default=None, blank=True)
+    summary = models.TextField(null=True, blank=True, editable=False)
     
     def like_count(self):
         return self.likes.count
     
     def comment_count(self):
         return self.comments.filter(parent__isnull=True).count()
+    
+    def save(self, *args, **kwargs):
+        if not self.summary and self.content:
+            self.summary = summarize_text(self.content, num_sentences=3)
+        super().save(*args, **kwargs)
     
     def __str__(self):
         return self.title
